@@ -8,79 +8,89 @@ import "./styles/SocialIcons.css";
 import { TbNotes } from "react-icons/tb";
 import { useEffect } from "react";
 import HoverLinks from "./HoverLinks";
+import gsap from "gsap";
 
 const SocialIcons = () => {
   useEffect(() => {
     const social = document.getElementById("social") as HTMLElement;
+    if (!social) return;
 
-    social.querySelectorAll("span").forEach((item) => {
-      const elem = item as HTMLElement;
+    const items = social.querySelectorAll("span");
+    const listeners: {
+      elem: HTMLElement;
+      onMouseMove: (e: MouseEvent) => void;
+      onMouseLeave: () => void;
+    }[] = [];
+
+    items.forEach((elem) => {
       const link = elem.querySelector("a") as HTMLElement;
-
-      const rect = elem.getBoundingClientRect();
-      let mouseX = rect.width / 2;
-      let mouseY = rect.height / 2;
-      let currentX = 0;
-      let currentY = 0;
-
-      const updatePosition = () => {
-        currentX += (mouseX - currentX) * 0.1;
-        currentY += (mouseY - currentY) * 0.1;
-
-        link.style.setProperty("--siLeft", `${currentX}px`);
-        link.style.setProperty("--siTop", `${currentY}px`);
-
-        requestAnimationFrame(updatePosition);
-      };
+      if (!link) return;
 
       const onMouseMove = (e: MouseEvent) => {
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const rect = elem.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
 
-        if (x < 40 && x > 10 && y < 40 && y > 5) {
-          mouseX = x;
-          mouseY = y;
-        } else {
-          mouseX = rect.width / 2;
-          mouseY = rect.height / 2;
-        }
+        gsap.to(link, {
+          x: x * 0.35,
+          y: y * 0.35,
+          duration: 0.3,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
       };
 
-      document.addEventListener("mousemove", onMouseMove);
-
-      updatePosition();
-
-      return () => {
-        elem.removeEventListener("mousemove", onMouseMove);
+      const onMouseLeave = () => {
+        gsap.to(link, {
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: "elastic.out(1.1, 0.4)",
+          overwrite: "auto",
+        });
       };
+
+      elem.addEventListener("mousemove", onMouseMove);
+      elem.addEventListener("mouseleave", onMouseLeave);
+
+      listeners.push({ elem, onMouseMove, onMouseLeave });
     });
+
+    return () => {
+      listeners.forEach(({ elem, onMouseMove, onMouseLeave }) => {
+        if (elem) {
+          elem.removeEventListener("mousemove", onMouseMove);
+          elem.removeEventListener("mouseleave", onMouseLeave);
+        }
+      });
+    };
   }, []);
 
   return (
     <div className="icons-section">
       <div className="social-icons" data-cursor="icons" id="social">
         <span>
-          <a href="https://github.com" target="_blank">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer">
             <FaGithub />
           </a>
         </span>
         <span>
-          <a href="https://www.linkedin.com" target="_blank">
+          <a href="https://linkedin.com/in/praddume" target="_blank" rel="noopener noreferrer">
             <FaLinkedinIn />
           </a>
         </span>
         <span>
-          <a href="https://x.com" target="_blank">
+          <a href="https://x.com" target="_blank" rel="noopener noreferrer">
             <FaXTwitter />
           </a>
         </span>
         <span>
-          <a href="https://www.instagram.com" target="_blank">
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
             <FaInstagram />
           </a>
         </span>
       </div>
-      <a className="resume-button" href="#">
+      <a className="resume-button" href="https://drive.google.com/file/d/1Ili-UJhh-Wb4-K0GQ-Gf-T71gK9DxfSo/view?usp=drive_link" target="_blank" rel="noopener noreferrer">
         <HoverLinks text="RESUME" />
         <span>
           <TbNotes />

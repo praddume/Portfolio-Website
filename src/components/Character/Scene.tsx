@@ -52,8 +52,10 @@ const Scene = () => {
       const light = setLighting(scene);
       let progress = setProgress((value) => setLoading(value));
       const { loadCharacter } = setCharacter(renderer, scene, camera);
+      let active = true;
 
       loadCharacter().then((gltf) => {
+        if (!active) return;
         if (gltf) {
           const animations = setAnimations(gltf);
           hoverDivRef.current && animations.hover(gltf, hoverDivRef.current);
@@ -106,8 +108,12 @@ const Scene = () => {
         landingDiv.addEventListener("touchstart", onTouchStart);
         landingDiv.addEventListener("touchend", onTouchEnd);
       }
+      let animationFrameId: number;
+      let isVisible = false;
+
       const animate = () => {
-        requestAnimationFrame(animate);
+        if (!isVisible) return;
+        animationFrameId = requestAnimationFrame(animate);
         if (headBone) {
           handleHeadRotation(
             headBone,
@@ -125,9 +131,30 @@ const Scene = () => {
         }
         renderer.render(scene, camera);
       };
-      animate();
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const wasVisible = isVisible;
+            isVisible = entry.isIntersecting;
+            if (isVisible && !wasVisible) {
+              clock.getDelta(); // Reset clock delta so no huge jump
+              animate();
+            } else if (!isVisible && wasVisible) {
+              cancelAnimationFrame(animationFrameId);
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+
+      observer.observe(canvasDiv.current);
+
       return () => {
+        active = false;
         clearTimeout(debounce);
+        observer.disconnect();
+        cancelAnimationFrame(animationFrameId);
         scene.clear();
         renderer.dispose();
         window.removeEventListener("resize", () =>
