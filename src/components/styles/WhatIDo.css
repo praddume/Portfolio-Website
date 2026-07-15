@@ -34,7 +34,7 @@
 }
 .what-box-in {
   flex-direction: column;
-  height: 500px;
+  height: 580px;
   margin-left: 200px;
   position: relative;
   display: none;
@@ -46,32 +46,34 @@
   transition: 0.5s;
   /* border: 0.5px dashed rgba(255, 255, 255, 0.3); */
   position: relative;
-  padding: 50px;
+  padding: 30px 40px;
   box-sizing: border-box;
 }
 
 .what-noTouch:hover,
 .what-content-active {
   min-height: 67%;
-  padding: 40px 50px;
+  padding: 30px 40px;
 }
 
 .what-noTouch:hover ~ .what-content,
 .what-box-in:hover .what-noTouch:not(:hover),
 .what-content.what-sibling {
   min-height: 33%;
-  padding: 10px 50px;
+  padding: 15px 40px;
 }
 .what-content h3 {
-  font-size: 35px;
+  font-size: 32px;
   letter-spacing: 1px;
-  margin: 0;
+  margin: 0 0 5px 0;
 }
 .what-content p {
   font-size: 14px;
   line-height: 18px;
   font-weight: 200;
   letter-spacing: 0.7px;
+  margin-top: 5px;
+  margin-bottom: 15px;
 }
 .what-content h4 {
   font-weight: 300;
@@ -214,6 +216,7 @@
   font-size: 12px;
   letter-spacing: 1px;
   font-family: "Geist", sans-serif;
+  margin-top: 0;
   margin-bottom: 5px;
 }
 @keyframes whatBorders {
@@ -338,7 +341,7 @@
   }
   .what-box-in {
     margin-left: 0px;
-    height: 450px;
+    height: 520px;
   }
   .what-content h5,
   .what-content-flex {
