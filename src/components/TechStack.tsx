@@ -4,27 +4,31 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Billboard, Html } from "@react-three/drei";
 
 const textureLoader = new THREE.TextureLoader();
+textureLoader.crossOrigin = "anonymous";
+
 const imageUrls = [
-  "/images/react2.webp",
-  "/images/next2.webp",
-  "/images/node2.webp",
-  "/images/express.webp",
-  "/images/mongo.webp",
-  "/images/mysql.webp",
-  "/images/typescript.webp",
-  "/images/javascript.webp",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
 ];
 const textures = imageUrls.map((url) => textureLoader.load(url));
 
 const techNodes = [
-  { name: "TypeScript", textureIndex: 6, orbit: 4.5, speed: 0.4, angleOffset: 0 },
-  { name: "JavaScript", textureIndex: 7, orbit: 4.5, speed: 0.4, angleOffset: Math.PI },
-  { name: "React", textureIndex: 0, orbit: 7.0, speed: 0.25, angleOffset: 0 },
-  { name: "Next.js", textureIndex: 1, orbit: 7.0, speed: 0.25, angleOffset: Math.PI / 2 },
-  { name: "Node.js", textureIndex: 2, orbit: 7.0, speed: 0.25, angleOffset: Math.PI },
-  { name: "Express.js", textureIndex: 3, orbit: 7.0, speed: 0.25, angleOffset: (3 * Math.PI) / 2 },
-  { name: "MongoDB", textureIndex: 4, orbit: 9.5, speed: 0.15, angleOffset: 0 },
-  { name: "MySQL", textureIndex: 5, orbit: 9.5, speed: 0.15, angleOffset: Math.PI },
+  { name: "Python", textureIndex: 0, orbit: 4.5, speed: 0.4, angleOffset: 0 },
+  { name: "C++", textureIndex: 1, orbit: 4.5, speed: 0.4, angleOffset: Math.PI },
+  
+  { name: "PyTorch", textureIndex: 2, orbit: 7.0, speed: 0.25, angleOffset: 0 },
+  { name: "Pandas", textureIndex: 3, orbit: 7.0, speed: 0.25, angleOffset: (2 * Math.PI) / 3 },
+  { name: "Figma", textureIndex: 4, orbit: 7.0, speed: 0.25, angleOffset: (4 * Math.PI) / 3 },
+  
+  { name: "MySQL", textureIndex: 5, orbit: 9.5, speed: 0.15, angleOffset: 0 },
+  { name: "PostgreSQL", textureIndex: 6, orbit: 9.5, speed: 0.15, angleOffset: (2 * Math.PI) / 3 },
+  { name: "Git", textureIndex: 7, orbit: 9.5, speed: 0.15, angleOffset: (4 * Math.PI) / 3 },
 ];
 
 function Nucleus({ isActive }: { isActive: boolean }) {
