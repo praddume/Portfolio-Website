@@ -13,46 +13,94 @@ const setCharacter = (
   dracoLoader.setDecoderPath("/draco/");
   loader.setDRACOLoader(dracoLoader);
 
+  const loadEncryptedCharacter = async (resolve: any, reject: any) => {
+    try {
+      const encryptedBlob = await decryptFile(
+        "/models/character.enc",
+        "Character3D#@"
+      );
+      const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
+
+      let character: THREE.Object3D;
+      loader.load(
+        blobUrl,
+        async (gltf) => {
+          character = gltf.scene;
+          await renderer.compileAsync(character, camera, scene);
+          character.traverse((child: any) => {
+            if (child.isMesh) {
+              const mesh = child as THREE.Mesh;
+              child.castShadow = true;
+              child.receiveShadow = true;
+              mesh.frustumCulled = true;
+            }
+          });
+          resolve(gltf);
+          setCharTimeline(character, camera);
+          setAllTimeline();
+          
+          const footR = character.getObjectByName("footR");
+          if (footR) footR.position.y = 3.36;
+          const footL = character.getObjectByName("footL");
+          if (footL) footL.position.y = 3.36;
+          
+          dracoLoader.dispose();
+        },
+        undefined,
+        (error) => {
+          console.error("Error loading GLTF model:", error);
+          reject(error);
+        }
+      );
+    } catch (err) {
+      reject(err);
+      console.error(err);
+    }
+  };
+
   const loadCharacter = () => {
     return new Promise<GLTF | null>(async (resolve, reject) => {
       try {
-        const encryptedBlob = await decryptFile(
-          "/models/character.enc",
-          "Character3D#@"
-        );
-        const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
-
-        let character: THREE.Object3D;
-        loader.load(
-          blobUrl,
-          async (gltf) => {
-            character = gltf.scene;
-            await renderer.compileAsync(character, camera, scene);
-            character.traverse((child: any) => {
-              if (child.isMesh) {
-                const mesh = child as THREE.Mesh;
-                child.castShadow = true;
-                child.receiveShadow = true;
-                mesh.frustumCulled = true;
-              }
-            });
-            resolve(gltf);
-            setCharTimeline(character, camera);
-            setAllTimeline();
-            character!.getObjectByName("footR")!.position.y = 3.36;
-            character!.getObjectByName("footL")!.position.y = 3.36;
-            dracoLoader.dispose();
-          },
-          undefined,
-          (error) => {
-            console.error("Error loading GLTF model:", error);
-            reject(error);
-          }
-        );
-      } catch (err) {
-        reject(err);
-        console.error(err);
+        const response = await fetch("/models/character.glb", { method: "HEAD" });
+        if (response.ok) {
+          loader.load(
+            "/models/character.glb",
+            async (gltf) => {
+              const character = gltf.scene;
+              await renderer.compileAsync(character, camera, scene);
+              character.traverse((child: any) => {
+                if (child.isMesh) {
+                  const mesh = child as THREE.Mesh;
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                  mesh.frustumCulled = true;
+                }
+              });
+              resolve(gltf);
+              setCharTimeline(character, camera);
+              setAllTimeline();
+              
+              const footR = character.getObjectByName("footR") || character.getObjectByName("RightFoot");
+              if (footR) footR.position.y = 3.36;
+              const footL = character.getObjectByName("footL") || character.getObjectByName("LeftFoot");
+              if (footL) footL.position.y = 3.36;
+              
+              dracoLoader.dispose();
+            },
+            undefined,
+            (error) => {
+              console.warn("Failed to load raw character.glb, loading encrypted default character:", error);
+              loadEncryptedCharacter(resolve, reject);
+            }
+          );
+          return;
+        }
+      } catch (e) {
+        console.warn("Raw character.glb check failed, loading encrypted default character:", e);
       }
+
+      // Fallback: load encrypted default character
+      loadEncryptedCharacter(resolve, reject);
     });
   };
 
