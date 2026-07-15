@@ -33,7 +33,7 @@ const Contact = () => {
               Github <MdArrowOutward />
             </a>
             <a
-              href="https://linkedin.com/in/praddume"
+              href="https://www.linkedin.com/in/praddume-attri-460b23298"
               target="_blank"
               rel="noopener noreferrer"
               data-cursor="disable"
