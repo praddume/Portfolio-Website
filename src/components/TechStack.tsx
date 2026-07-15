@@ -1,15 +1,7 @@
 import * as THREE from "three";
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
-
-import {
-  BallCollider,
-  Physics,
-  RigidBody,
-  CylinderCollider,
-  RapierRigidBody,
-} from "@react-three/rapier";
+import { Environment, Billboard, Html } from "@react-three/drei";
 
 const textureLoader = new THREE.TextureLoader();
 const imageUrls = [
@@ -24,109 +16,179 @@ const imageUrls = [
 ];
 const textures = imageUrls.map((url) => textureLoader.load(url));
 
-const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
+const techNodes = [
+  { name: "TypeScript", textureIndex: 6, orbit: 4.5, speed: 0.4, angleOffset: 0 },
+  { name: "JavaScript", textureIndex: 7, orbit: 4.5, speed: 0.4, angleOffset: Math.PI },
+  { name: "React", textureIndex: 0, orbit: 7.0, speed: 0.25, angleOffset: 0 },
+  { name: "Next.js", textureIndex: 1, orbit: 7.0, speed: 0.25, angleOffset: Math.PI / 2 },
+  { name: "Node.js", textureIndex: 2, orbit: 7.0, speed: 0.25, angleOffset: Math.PI },
+  { name: "Express.js", textureIndex: 3, orbit: 7.0, speed: 0.25, angleOffset: (3 * Math.PI) / 2 },
+  { name: "MongoDB", textureIndex: 4, orbit: 9.5, speed: 0.15, angleOffset: 0 },
+  { name: "MySQL", textureIndex: 5, orbit: 9.5, speed: 0.15, angleOffset: Math.PI },
+];
 
-const spheres = [...Array(30)].map(() => ({
-  scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
-}));
+function Nucleus({ isActive }: { isActive: boolean }) {
+  const ref = useRef<THREE.Mesh>(null);
 
-type SphereProps = {
-  vec?: THREE.Vector3;
-  scale: number;
-  r?: typeof THREE.MathUtils.randFloatSpread;
-  material: THREE.MeshPhysicalMaterial;
-  isActive: boolean;
-};
-
-function SphereGeo({
-  vec = new THREE.Vector3(),
-  scale,
-  r = THREE.MathUtils.randFloatSpread,
-  material,
-  isActive,
-}: SphereProps) {
-  const api = useRef<RapierRigidBody | null>(null);
-
-  useFrame((_state, delta) => {
+  useFrame((state) => {
     if (!isActive) return;
-    delta = Math.min(0.1, delta);
-    const impulse = vec
-      .copy(api.current!.translation())
-      .normalize()
-      .multiply(
-        new THREE.Vector3(
-          -50 * delta * scale,
-          -150 * delta * scale,
-          -50 * delta * scale
-        )
-      );
-
-    api.current?.applyImpulse(impulse, true);
+    const scale = 1 + Math.sin(state.clock.getElapsedTime() * 1.5) * 0.06;
+    if (ref.current) {
+      ref.current.scale.set(scale, scale, scale);
+      ref.current.rotation.y = state.clock.getElapsedTime() * 0.2;
+    }
   });
 
   return (
-    <RigidBody
-      linearDamping={0.75}
-      angularDamping={0.15}
-      friction={0.2}
-      position={[r(20), r(20) - 25, r(20) - 10]}
-      ref={api}
-      colliders={false}
-    >
-      <BallCollider args={[scale]} />
-      <CylinderCollider
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, 1.2 * scale]}
-        args={[0.15 * scale, 0.275 * scale]}
+    <mesh ref={ref}>
+      <sphereGeometry args={[1.1, 32, 32]} />
+      <meshPhysicalMaterial
+        color="#00828a"
+        emissive="#00828a"
+        emissiveIntensity={1.2}
+        roughness={0.1}
+        metalness={0.8}
+        transmission={0.3}
+        thickness={0.5}
       />
-      <mesh
-        castShadow
-        receiveShadow
-        scale={scale}
-        geometry={sphereGeometry}
-        material={material}
-        rotation={[0.3, 1, 1]}
-      />
-    </RigidBody>
+    </mesh>
   );
 }
 
-type PointerProps = {
-  vec?: THREE.Vector3;
+function OrbitRing({ radius }: { radius: number }) {
+  return (
+    <mesh rotation={[Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[radius - 0.015, radius + 0.015, 64]} />
+      <meshBasicMaterial
+        color="#ffffff"
+        transparent
+        opacity={0.06}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+interface OrbitNodeProps {
+  name: string;
+  texture: THREE.Texture;
+  orbitRadius: number;
+  speed: number;
+  angleOffset: number;
+  index: number;
+  hoveredNode: number | null;
+  setHoveredNode: (index: number | null) => void;
   isActive: boolean;
-};
+}
 
-function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
-  const ref = useRef<RapierRigidBody>(null);
+function OrbitNode({
+  name,
+  texture,
+  orbitRadius,
+  speed,
+  angleOffset,
+  index,
+  hoveredNode,
+  setHoveredNode,
+  isActive,
+}: OrbitNodeProps) {
+  const groupRef = useRef<THREE.Group>(null);
+  const [localHovered, setLocalHovered] = useState(false);
 
-  useFrame(({ pointer, viewport }) => {
+  useFrame((state) => {
     if (!isActive) return;
-    const targetVec = vec.lerp(
-      new THREE.Vector3(
-        (pointer.x * viewport.width) / 2,
-        (pointer.y * viewport.height) / 2,
-        0
-      ),
-      0.2
-    );
-    ref.current?.setNextKinematicTranslation(targetVec);
+    const isAnyHovered = hoveredNode !== null;
+    const speedMultiplier = isAnyHovered ? 0.15 : 1.0;
+    const time = state.clock.getElapsedTime();
+    const angle = time * speed * speedMultiplier + angleOffset;
+
+    if (groupRef.current) {
+      groupRef.current.position.x = Math.cos(angle) * orbitRadius;
+      groupRef.current.position.y = Math.sin(angle) * orbitRadius;
+      groupRef.current.position.z = 0;
+    }
   });
 
+  const handlePointerOver = (e: any) => {
+    e.stopPropagation();
+    setLocalHovered(true);
+    setHoveredNode(index);
+  };
+
+  const handlePointerOut = () => {
+    setLocalHovered(false);
+    setHoveredNode(null);
+  };
+
   return (
-    <RigidBody
-      position={[100, 100, 100]}
-      type="kinematicPosition"
-      colliders={false}
-      ref={ref}
-    >
-      <BallCollider args={[2]} />
-    </RigidBody>
+    <group ref={groupRef}>
+      <Billboard>
+        {/* Core Logo Image Badge */}
+        <mesh
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <circleGeometry args={[0.65, 32]} />
+          <meshBasicMaterial map={texture} transparent depthWrite />
+        </mesh>
+        
+        {/* Glow Ring/Bezel */}
+        <mesh position={[0, 0, -0.01]}>
+          <circleGeometry args={[0.72, 32]} />
+          <meshPhysicalMaterial
+            color={localHovered ? "#38b2ac" : "#1a161f"}
+            roughness={0.1}
+            transmission={0.6}
+            thickness={0.5}
+            transparent
+            opacity={0.85}
+          />
+        </mesh>
+
+        {/* Outer glowing border ring */}
+        <mesh position={[0, 0, -0.02]}>
+          <ringGeometry args={[0.71, 0.74, 32]} />
+          <meshBasicMaterial
+            color={localHovered ? "#38b2ac" : "rgba(255, 255, 255, 0.1)"}
+            transparent
+            opacity={localHovered ? 1 : 0.2}
+          />
+        </mesh>
+
+        {/* HTML Tooltip */}
+        {localHovered && (
+          <Html distanceFactor={15} position={[0, 1.0, 0]} center>
+            <div
+              style={{
+                background: "rgba(11, 8, 12, 0.95)",
+                backdropFilter: "blur(6px)",
+                border: "1px solid rgba(56, 178, 172, 0.4)",
+                color: "#eae5ec",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                fontFamily: "'Geist', sans-serif",
+                fontSize: "11px",
+                fontWeight: 600,
+                letterSpacing: "0.8px",
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.6)",
+                textTransform: "uppercase",
+              }}
+            >
+              {name}
+            </div>
+          </Html>
+        )}
+      </Billboard>
+    </group>
   );
 }
 
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [hoveredNode, setHoveredNode] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -143,28 +205,13 @@ const TechStack = () => {
     return () => observer.disconnect();
   }, []);
 
-  const materials = useMemo(() => {
-    return textures.map(
-      (texture) =>
-        new THREE.MeshPhysicalMaterial({
-          map: texture,
-          emissive: "#ffffff",
-          emissiveMap: texture,
-          emissiveIntensity: 0.3,
-          metalness: 0.5,
-          roughness: 1,
-          clearcoat: 0.1,
-        })
-    );
-  }, []);
-
   return (
     <div className="techstack" ref={containerRef}>
-      <h2> My Techstack</h2>
+      <h2>My Techstack</h2>
 
       <Canvas
         shadows
-        gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
+        gl={{ alpha: true, stencil: false, depth: true, antialias: true }}
         camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
         onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
         className="tech-canvas"
@@ -180,17 +227,33 @@ const TechStack = () => {
           shadow-mapSize={[512, 512]}
         />
         <directionalLight position={[0, 5, -4]} intensity={2} />
-        <Physics gravity={[0, 0, 0]}>
-          <Pointer isActive={isActive} />
-          {spheres.map((props, i) => (
-            <SphereGeo
+
+        <group rotation={[0.4, 0, 0]}>
+          {/* Central Beating Nucleus */}
+          <Nucleus isActive={isActive} />
+
+          {/* Orbit Rings */}
+          <OrbitRing radius={4.5} />
+          <OrbitRing radius={7.0} />
+          <OrbitRing radius={9.5} />
+
+          {/* Orbiting Nodes */}
+          {techNodes.map((node, i) => (
+            <OrbitNode
               key={i}
-              {...props}
-              material={materials[Math.floor(Math.random() * materials.length)]}
+              name={node.name}
+              texture={textures[node.textureIndex]}
+              orbitRadius={node.orbit}
+              speed={node.speed}
+              angleOffset={node.angleOffset}
+              index={i}
+              hoveredNode={hoveredNode}
+              setHoveredNode={setHoveredNode}
               isActive={isActive}
             />
           ))}
-        </Physics>
+        </group>
+
         <Environment
           files="/models/char_enviorment.hdr"
           environmentIntensity={0.5}
