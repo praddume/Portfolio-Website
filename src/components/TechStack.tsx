@@ -7,14 +7,14 @@ const textureLoader = new THREE.TextureLoader();
 textureLoader.crossOrigin = "anonymous";
 
 const imageUrls = [
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+  "/images/python.svg",
+  "/images/cplusplus.svg",
+  "/images/pytorch.svg",
+  "/images/pandas.svg",
+  "/images/figma.svg",
+  "/images/mysql.svg",
+  "/images/postgresql.svg",
+  "/images/git.svg",
 ];
 const textures = imageUrls.map((url) => textureLoader.load(url));
 
