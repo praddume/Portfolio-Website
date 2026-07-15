@@ -34,7 +34,7 @@
 }
 .what-box-in {
   flex-direction: column;
-  height: 580px;
+  height: 680px;
   margin-left: 200px;
   position: relative;
   display: none;
@@ -46,14 +46,14 @@
   transition: 0.5s;
   /* border: 0.5px dashed rgba(255, 255, 255, 0.3); */
   position: relative;
-  padding: 30px 40px;
+  padding: 20px 40px;
   box-sizing: border-box;
 }
 
 .what-noTouch:hover,
 .what-content-active {
   min-height: 67%;
-  padding: 30px 40px;
+  padding: 20px 40px;
 }
 
 .what-noTouch:hover ~ .what-content,
@@ -329,7 +329,7 @@
     justify-content: left;
   }
   .what-box:last-child {
-    height: 500px;
+    height: 600px;
   }
   .what-box {
     width: 500px;
@@ -341,7 +341,7 @@
   }
   .what-box-in {
     margin-left: 0px;
-    height: 520px;
+    height: 600px;
   }
   .what-content h5,
   .what-content-flex {
