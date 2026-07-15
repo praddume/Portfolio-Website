@@ -92,6 +92,15 @@ const WhatIDo = () => {
               <p>
                 Building robust, scalable, and optimized software architectures. Experienced in database optimization, query tuning, and system management to reduce latency and load times.
               </p>
+              <h5>Areas of Focus</h5>
+              <div className="what-content-flex" style={{ marginBottom: "15px" }}>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Data Structures & Algorithms</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Database Management</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Query Optimization</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>System Management</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Project Management</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Leadership</div>
+              </div>
               <h5>Skillset & tools</h5>
               <div className="what-content-flex">
                 <div className="what-tags">Python</div>
@@ -132,6 +141,12 @@ const WhatIDo = () => {
               <p>
                 Developing and deploying practical machine learning, deep learning, and NLP models. Experienced in building AI assistants, OCR platforms, and automated workflow pipelines.
               </p>
+              <h5>Areas of Focus</h5>
+              <div className="what-content-flex" style={{ marginBottom: "15px" }}>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Artificial Intelligence</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Machine Learning</div>
+                <div className="what-tags" style={{ backgroundColor: "rgba(56, 178, 172, 0.08)", borderColor: "rgba(56, 178, 172, 0.15)", color: "#38b2ac" }}>Natural Language Processing</div>
+              </div>
               <h5>Skillset & tools</h5>
               <div className="what-content-flex">
                 <div className="what-tags">PyTorch</div>

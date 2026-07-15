@@ -20,9 +20,22 @@ const Career = () => {
               </div>
               <h3>2026</h3>
             </div>
-            <p>
-              Focused on learning core computer science, advanced data structures, database management systems, algorithms, statistics, convex optimization, and natural language processing.
-            </p>
+            <div className="career-details">
+              <p>
+                Focused on learning core computer science, advanced data structures, database management systems, algorithms, statistics, convex optimization, and natural language processing.
+              </p>
+              <div className="career-electives-title">Technical Electives</div>
+              <div className="career-electives-list">
+                <span className="career-elective-badge">Artificial Intelligence</span>
+                <span className="career-elective-badge">Convex Optimization</span>
+                <span className="career-elective-badge">Statistics in ML</span>
+                <span className="career-elective-badge">Machine Learning</span>
+                <span className="career-elective-badge">Natural Language Processing</span>
+                <span className="career-elective-badge">Database Management Systems</span>
+                <span className="career-elective-badge">Analysis & Design of Algorithms</span>
+                <span className="career-elective-badge">Computer Networks</span>
+              </div>
+            </div>
           </div>
           <div className="career-info-box">
             <div className="career-info-in">
