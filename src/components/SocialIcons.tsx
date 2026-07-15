@@ -70,7 +70,7 @@ const SocialIcons = () => {
     <div className="icons-section">
       <div className="social-icons" data-cursor="icons" id="social">
         <span>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/praddume" target="_blank" rel="noopener noreferrer">
             <FaGithub />
           </a>
         </span>

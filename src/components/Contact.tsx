@@ -24,7 +24,7 @@ const Contact = () => {
           <div className="contact-box">
             <h4>Social</h4>
             <a
-              href="https://github.com"
+              href="https://github.com/praddume"
               target="_blank"
               rel="noopener noreferrer"
               data-cursor="disable"
